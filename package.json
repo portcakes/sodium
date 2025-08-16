@@ -1,0 +1,16 @@
+{
+    "private": true,
+    "packageManager": "pnpm@10.0.0",
+    "scripts": {
+      "dev": "turbo run dev --parallel",
+      "build": "turbo run build",
+      "start": "turbo run start",
+      "lint": "turbo run lint",
+      "typecheck": "turbo run typecheck",
+      "test": "turbo run test",
+      "db:migrate": "pnpm --filter @sodium/db prisma migrate dev",
+      "db:generate": "pnpm --filter @sodium/db prisma generate",
+      "db:seed": "pnpm --filter @sodium/db prisma db seed"
+    }
+  }
+  

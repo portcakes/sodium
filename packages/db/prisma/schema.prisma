@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  profile   Profile?
+}
+
+model Profile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  handle      String   @unique
+  displayName String
+  bio         String   @default("")
+  avatarUrl   String? 
+  bannerUrl   String?
+  themeId     String?
+  layoutJson  Json?    
+  visibility  String   @default("public")
+  posts       Post[]
+  createdAt   DateTime @default(now())
+
+  Media Media[]
+
+  Reaction Reaction[]
+
+  followers Follow[] @relation("Follower")
+  following Follow[] @relation("Followee")
+
+}
+
+model Post {
+  id               String   @id @default(cuid())
+  authorProfileId  String
+  author           Profile  @relation(fields: [authorProfileId], references: [id])
+  content          String
+  cw               String?
+  replyToId        String?
+  replyTo          Post?    @relation("Reply", fields: [replyToId], references: [id])
+  replies          Post[]   @relation("Reply")
+  visibility       String   @default("public")
+  createdAt        DateTime @default(now())
+  media            Media[]
+  reactions        Reaction[]
+}
+
+model Media {
+  id              String   @id @default(cuid())
+  ownerProfileId  String
+  owner           Profile  @relation(fields: [ownerProfileId], references: [id])
+  postId          String?
+  post            Post?    @relation(fields: [postId], references: [id])
+  kind            String   @default("image")
+  originalUrl     String
+  variants        Json
+  altText         String
+  createdAt       DateTime @default(now())
+}
+
+model Reaction {
+  postId     String
+  profileId  String
+  kind       String   @default("like")
+  createdAt  DateTime @default(now())
+  post       Post     @relation(fields: [postId], references: [id])
+  profile    Profile  @relation(fields: [profileId], references: [id])
+
+  @@id([postId, profileId, kind])
+}
+
+model Theme {
+  id             String   @id @default(cuid())
+  name           String
+  tokens         Json
+  authorProfileId String?
+}
+
+model Asset {
+  id             String   @id @default(cuid())
+  type           String   // background | sticker | font
+  files          Json
+  authorProfileId String?
+  license        String   @default("CC-BY-4.0")
+  priceCents     Int?
+  status         String   @default("published")
+}
+
+model Follow {
+  followerId String
+  followeeId String
+  state      String   @default("accepted")
+  createdAt  DateTime @default(now())
+
+  follower   Profile  @relation("Follower", fields: [followerId], references: [id])
+  followee   Profile  @relation("Followee", fields: [followeeId], references: [id])
+
+  @@id([followerId, followeeId])
+}
