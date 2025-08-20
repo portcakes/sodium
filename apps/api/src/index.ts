@@ -40,6 +40,13 @@ app.post('/v1/posts', async c => {
   return c.json(post, 201);
 });
 
+app.post('/v1/media/presign', async c => {
+  const { key, contentType } = await c.req.json();
+  if (!key || !contentType) return c.json({ error: 'bad_request' }, 400);
+  const url = await (await import('./s3')).presign(key, contentType);
+  return c.json({ url, key });
+});
+
 const port = Number(process.env.PORT ?? 4000);
 serve({ fetch: app.fetch, port });
 console.log(`api listening on :${port}`);
