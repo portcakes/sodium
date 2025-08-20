@@ -1,5 +1,7 @@
 {
     "name": "@sodium/db",
+    "main": "src/index.ts",
+    "types": "src/index.ts",
     "scripts": {
       "prisma": "prisma",
       "migrate": "prisma migrate dev",
